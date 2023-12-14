@@ -14,7 +14,7 @@ RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
 """
 
 class TransitionModel(nn.Module):
-    def __init__(self, action_size,state_size, hidden_layers):
+    def __init__(self, action_sz,state_sz, stochastic_sz, deterministic_size, hidden_layers):
         super().__init__()
         pass
-    
+
