@@ -14,7 +14,30 @@ RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
 """
 
 class TransitionModel(nn.Module):
-    def __init__(self, action_sz,state_sz, stochastic_sz, deterministic_size, hidden_layers):
+    def __init__(self, action_sz, state_sz, stochastic_sz, deterministic_sz, hidden_sz, distribution = td.Normal):
         super().__init__()
-        pass
+        self.action_sz = action_sz
+        self.stochastic_sz= stochastic_sz
+        self.deterministic_sz = deterministic_sz
+        self.hidden_sz = hidden_sz
+        self._activation = nn.ELU
+        self.lstm = nn.GRUCell(hidden_sz, deterministic_sz)
+        #self._rnn_input_model = self._build_rnn_input_model()
+        #self._stochastic_prior_model = self._build_stochastic_model()
+        self._dist = distribution
+
+    def initial_state(self, batch_sz, ):
+        state =RSSMState(torch.zeros(batch_sz, self._stoch_sz, **kwargs),
+            torch.zeros(batch_sz, self._stoch_sz, **kwargs),
+            torch.zeros(batch_sz, self._stoch_sz, **kwargs),
+            torch.zeros(batch_sz, self._deter_sz, **kwargs)
+                            )
+        return state
+
+
+
+    def forward(self, prev_state, prev_action):
+        input = nn.Sequential(nn.Linear(self.action_sz + self.stochastic_sz, self.hidden_sz),
+                              self._activation())
+        
 
