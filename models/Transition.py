@@ -3,7 +3,7 @@ import torch.distributions as td
 import torch.nn as nn
 import torch.nn.functional as tf
 from rlpyt.utils.collections import namedarraytuple
-from rlpyt.utils.buffer import buffer_method
+#from rlpyt.utils.buffer import buffer_method
 
 RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
 """
@@ -27,7 +27,7 @@ class TransitionModel(nn.Module):
         self.stochastic_model = nn.Sequential(nn.Linear(self.hidden_sz,self.hidden_sz),
                                               self.activation(),
                                               nn.Linear(self.hidden_sz, self.hidden_sz *2),
-                                              self.activation())
+                                                    )
         self._dist = distribution
 
     def initial_state(self, batch_sz, ):
@@ -53,7 +53,7 @@ class TransitionModel(nn.Module):
         return RSSMState(mean, std, stochastic_state, deterministic_state)
 
 
-        
+
         
 class Transition_iterator(nn.Module):
     """
@@ -66,6 +66,7 @@ class Transition_iterator(nn.Module):
         prior states: size(time_steps, batch_size, state_size)
     """
     def __init__(self, transition_model):
+        super().__init__()
         self.transition_model = transition_model
 
     def forward(self,time_steps, actions, starting_state):
@@ -81,15 +82,4 @@ class Transition_iterator(nn.Module):
         torch.stack([state.stoch for state in priors], dim=0),
         torch.stack([state.deter for state in priors], dim=0)
         )
-
-
-
-
-def stack_states(rssm_states: list, dim):
-    return RSSMState(
-        torch.stack([state.mean for state in rssm_states], dim=dim),
-        torch.stack([state.std for state in rssm_states], dim=dim),
-        torch.stack([state.stoch for state in rssm_states], dim=dim),
-        torch.stack([state.deter for state in rssm_states], dim=dim),
-    )
 
