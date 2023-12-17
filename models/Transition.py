@@ -40,7 +40,7 @@ class TransitionModel(nn.Module):
 
 
 
-    def forward(self, prev_state, prev_action):
+    def forward(self, prev_action ,prev_state):
         prev_input = self.activation(self.linear1(torch.cat([prev_action, prev_state.stoch], dim=-1)))
         # In GRUcell we pass previous  stochastic state and action as input features and
         # previous deterministic state as previous hidden state of the rnn
@@ -55,4 +55,41 @@ class TransitionModel(nn.Module):
 
         
         
+class Transition_iterator(nn.Module):
+    """
+    This class is used to run the transition model for subsequents timesteps
+        INPUTS:
+        time_steps: number of steps to perform
+        actions: actions to perform,  size(time_steps, batch_size, action_size)
+        starting_state: RSSM state, size(batch_size, state_size)
+        OUTPUT:
+        prior states: size(time_steps, batch_size, state_size)
+    """
+    def __init__(self, transition_model):
+        self.transition_model = transition_model
+
+    def forward(self,time_steps, actions, starting_state):
+        priors = []
+        state = starting_state
+        for t in range(time_steps):
+            state = self.transition_model(actions[t], state)
+            priors.append(state)
+
+        return RSSMState(
+        torch.stack([state.mean for state in priors], dim=0),
+        torch.stack([state.std for state in priors], dim=0),
+        torch.stack([state.stoch for state in priors], dim=0),
+        torch.stack([state.deter for state in priors], dim=0)
+        )
+
+
+
+
+def stack_states(rssm_states: list, dim):
+    return RSSMState(
+        torch.stack([state.mean for state in rssm_states], dim=dim),
+        torch.stack([state.std for state in rssm_states], dim=dim),
+        torch.stack([state.stoch for state in rssm_states], dim=dim),
+        torch.stack([state.deter for state in rssm_states], dim=dim),
+    )
 
