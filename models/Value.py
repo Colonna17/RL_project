@@ -23,7 +23,7 @@ class ValueModel(nn.Module):
     def forward(self, input):
         dense = self.linear1(input)
         dense = self.activation(dense)
-        for i in range(self.n_layers -1):
+        for i in range(1, self.n_layers):
             dense = self.linear2(dense)
             dense = self.activation(dense)
         output = self.linear3(dense)
