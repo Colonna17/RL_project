@@ -41,19 +41,79 @@ class ObservationEnc(nn.Module):
 
 
 class ObservationDec(nn.Module):
-    def __init__(self, hidden_sz, stride_sz, kernel_sz = 5, img_size = (3,64,64)):
+    def __init__(self, stride_sz, hidden_sz=32, kernel_sz = 5, img_size = (3,64,64), embedding_size = 1024):
         super().__init__()
         self.hidden_sz = hidden_sz
         stride = 2
-        k_size = 4
-        self.dim1 = img_size(0)
-        self.dim2 = img_size(1)
-        self.conv1 = nn.Conv2d(self.dim1, hidden_sz, k_size, stride)
-        self.conv2 = nn.Conv2d(hidden_sz, hidden_sz *2, k_size, stride)
-        self.conv3 = nn.Conv2d(self.dim1*2, hidden_sz*4, k_size, stride)
-        self.conv4 = nn.Conv2d(self.dim1*4, hidden_sz*8, k_size, stride)
+        padding = 0
+        dim1 = img_size(0)
+        dim2 = img_size(1)
         self.activation = nn.ReLU   
+        conv1_shape = conv_out_shape((dim2 , dim2 ), padding, 6, stride)
+        conv1_pad = output_padding_shape(
+            (dim2 , dim2 ), conv1_shape, padding, 6, stride
+        )
+        conv2_shape = conv_out_shape(conv1_shape, padding, 6, stride)
+        conv2_pad = output_padding_shape(
+            conv1_shape, conv2_shape, padding, 6, stride
+        )
+        conv3_shape = conv_out_shape(conv2_shape, padding, 5, stride)
+        conv3_pad = output_padding_shape(
+            conv2_shape, conv3_shape, padding, 5, stride
+        )
+        conv4_shape = conv_out_shape(conv3_shape, padding, 5, stride)
+        conv4_pad = output_padding_shape(
+            conv3_shape, conv4_shape, padding, 5, stride
+        )
+        self.conv_shape = (hidden_sz*32, *conv4_shape)
+        self.linear = nn.Linear(embedding_size , hidden_sz*32* np.prod(conv4_shape).item())
+
+        self.decoder = nn.Sequential(nn.ConvTranspose2d(hidden_sz*32, hidden_sz*4, 5, stride,
+                                                        output_padding=conv4_pad),
+                                     self.activation(),
+                                     nn.ConvTranspose2d(hidden_sz*4,hidden_sz*2, 5,stride,
+                                                        output_padding=conv3_pad),
+                                     self.activation(),
+                                     nn.ConvTranspose2d(hidden_sz*2,hidden_sz, 6,stride,
+                                                        output_padding=conv2_pad ),
+                                     self.activation(),
+                                     nn.ConvTranspose2d(hidden_sz, dim1, 6, stride,
+                                                         output_padding=conv1_pad),
+                                    )
+
+    def forward(self, x):
+        """
+        INPUTS
+        encoding: encoded observation from latent space, size(*batch_shape, embed_size)
+        OUTPUTS
+        observation: returns an image size tensor, size(*batch_shape, *self.shape)
+        """
+        batch_shape = x.shape[:-1]
+        embed_size = x.shape[-1]
+        squeezed_size = np.prod(batch_shape).item()
+        x = x.reshape(squeezed_size, embed_size)
+        x = self.linear(x)
+        x = torch.reshape(x, (squeezed_size, *self.conv_shape))
+        x = self.decoder(x)
+        mean = torch.reshape(x, (*batch_shape, *self.shape))
+        obs_dist = td.Independent(td.Normal(mean, 1), len(self.shape))
+        return obs_dist
 
 
+def conv_out(h_in, padding, kernel_size, stride):
+    return int((h_in + 2.0 * padding - (kernel_size - 1.0) - 1.0) / stride + 1.0)
 
 
+def output_padding(h_in, conv_out, padding, kernel_size, stride):
+    return h_in - (conv_out - 1) * stride + 2 * padding - (kernel_size - 1) - 1
+
+
+def conv_out_shape(h_in, padding, kernel_size, stride):
+    return tuple(conv_out(x, padding, kernel_size, stride) for x in h_in)
+
+
+def output_padding_shape(h_in, conv_out, padding, kernel_size, stride):
+    return tuple(
+        output_padding(h_in[i], conv_out[i], padding, kernel_size, stride)
+        for i in range(len(h_in))
+    )
