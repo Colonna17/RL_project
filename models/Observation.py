@@ -81,17 +81,17 @@ class ObservationDec(nn.Module):
                                                          output_padding=conv1_pad),
                                     )
 
-    def forward(self, x):
+    def forward(self, encoding):
         """
         INPUTS
         encoding: encoded observation from latent space, size(*batch_shape, embed_size)
         OUTPUTS
         observation: returns an image size tensor, size(*batch_shape, *self.shape)
         """
-        batch_shape = x.shape[:-1]
-        embed_size = x.shape[-1]
+        batch_shape = encoding.shape[:-1]
+        embed_size = encoding.shape[-1]
         squeezed_size = np.prod(batch_shape).item()
-        x = x.reshape(squeezed_size, embed_size)
+        x = encoding.reshape(squeezed_size, embed_size)
         x = self.linear(x)
         x = torch.reshape(x, (squeezed_size, *self.conv_shape))
         x = self.decoder(x)
