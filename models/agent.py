@@ -25,7 +25,7 @@ RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
     indexing (__getitem__) behavior (e.g. numpy arrays or torch tensors).
     Can be used as a wrapper to the state of the RSSM models
 """
-class Dreamer_Agent(nn.Module):
+class AgentModel(nn.Module):
     """
     This class merges together all modules of the latent dynamics model ( transition,
     representation, observation and reward model) and the ones of Dreamer agent, that are 
@@ -139,3 +139,6 @@ class Dreamer_Agent(nn.Module):
     def state_transition(self, prev_action, prev_state):
         state = self.transition(prev_action, prev_state)
         return state
+
+
+
