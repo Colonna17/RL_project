@@ -41,7 +41,7 @@ class RepresentationModel(nn.Module):
 
 
 
-    def initial_state(self, batch_sz, ):
+    def initial_state(self, batch_sz, **kwargs):
         state =RSSMState(torch.zeros(batch_sz, self._stoch_sz, **kwargs),
             torch.zeros(batch_sz, self._stoch_sz, **kwargs),
             torch.zeros(batch_sz, self._stoch_sz, **kwargs),
@@ -50,7 +50,8 @@ class RepresentationModel(nn.Module):
         return state
     
 
-    def forward(self, prev_action ,prev_state, observation):
+#    def forward(self, prev_action ,prev_state, observation):
+    def forward(self,observation, prev_action ,prev_state):
         #The prior is obtained from Transition model 
         prior_state = self.transition(prev_action, prev_state)
         stochastic_input = torch.cat([prior_state.deter, observation], -1)
@@ -61,6 +62,12 @@ class RepresentationModel(nn.Module):
         #stoch_state = dist.sample()
         posterior_state = RSSMState(mean, std, stoch_state, prior_state.deter)
         return prior_state, posterior_state
+
+
+
+
+
+
 
 class Representation_iterator(nn.Module):
     """
@@ -79,13 +86,13 @@ class Representation_iterator(nn.Module):
         self.transition_model = transition_model
         self.representation_model = representation_model
 
-    def forward(self,time_steps, actions, starting_state, observation):
+    def forward(self,time_steps, actions, starting_state, observations):
         priors =[]
         posteriors = []
         previous_state = starting_state
         for t in range(time_steps):
             prior_state, posterior_state = self.representation_model(
-                observation[t], actions[t], previous_state)
+                observations[t], actions[t], previous_state)
             priors.append(prior_state)
             posteriors.append(posterior_state)
             previous_state = posterior_state
@@ -103,22 +110,6 @@ class Representation_iterator(nn.Module):
             )
         return prior, posterior
                        
-
-
-
-        # priors = []
-        # posteriors = []
-        # for t in range(steps):
-        #     prior_state, posterior_state = self.representation_model(
-        #         obs_embed[t], action[t], prev_state
-        #     )
-        #     priors.append(prior_state)
-        #     posteriors.append(posterior_state)
-        #     prev_state = posterior_state
-        # prior = stack_states(priors, dim=0)
-        # post = stack_states(posteriors, dim=0)
-        # return prior, post
-
 
 
  

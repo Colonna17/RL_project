@@ -20,7 +20,7 @@ class ValueModel(nn.Module):
         self.activation = nn.ELU
 
     
-    def forward(self, input):
+    def forward(self, input): # Input is the concatenation of stoch and deterministic states
         dense = self.linear1(input)
         dense = self.activation(dense)
         for i in range(1, self.n_layers):

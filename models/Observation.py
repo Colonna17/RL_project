@@ -12,7 +12,7 @@ back into an image. For this part a transposed CNN is used as stated in the pape
 """
 
 class ObservationEnc(nn.Module):
-    def __init__(self, stride_sz, hidden_sz = 32, kernel_sz = 5, img_size = (3,64,64)):
+    def __init__(self, stride_sz=2, hidden_sz = 32, kernel_sz = 5, img_size = (3,64,64)):
         super().__init__()
         self.hidden_sz = hidden_sz
         stride = 2
@@ -38,10 +38,19 @@ class ObservationEnc(nn.Module):
         embed = self.activation(embed)
         embed = torch.reshape(embed, (*batch_shape, -1))
         return embed
+    
+    @property
+    def embed_size(self):
+        conv1_shape = conv_out_shape(self.shape[1:], 0, 4, self.stride)
+        conv2_shape = conv_out_shape(conv1_shape, 0, 4, self.stride)
+        conv3_shape = conv_out_shape(conv2_shape, 0, 4, self.stride)
+        conv4_shape = conv_out_shape(conv3_shape, 0, 4, self.stride)
+        embed_size = 8 * self.depth * np.prod(conv4_shape).item()
+        return embed_size
 
 
 class ObservationDec(nn.Module):
-    def __init__(self, stride_sz, hidden_sz=32, kernel_sz = 5, img_size = (3,64,64), embedding_size = 1024):
+    def __init__(self, stride_sz=2, hidden_sz=32, kernel_sz = 5, img_size = (3,64,64), embedding_size = 1024):
         super().__init__()
         self.hidden_sz = hidden_sz
         stride = 2

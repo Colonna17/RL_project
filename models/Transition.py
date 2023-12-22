@@ -14,7 +14,7 @@ RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
 """
 
 class TransitionModel(nn.Module):
-    def __init__(self, action_sz, state_sz, stochastic_sz, deterministic_sz, hidden_sz, distribution = td.Normal):
+    def __init__(self, action_sz, stochastic_sz, deterministic_sz, hidden_sz, distribution = td.Normal):
         super().__init__()
         self.action_sz = action_sz
         self.stochastic_sz= stochastic_sz
@@ -30,13 +30,13 @@ class TransitionModel(nn.Module):
                                                     )
         self._dist = distribution
 
-    def initial_state(self, batch_sz, ):
-        state =RSSMState(torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-            torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-            torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-            torch.zeros(batch_sz, self._deter_sz, **kwargs)
-                            )
-        return state
+    # def initial_state(self, batch_sz, ):
+    #     state =RSSMState(torch.zeros(batch_sz, self._stoch_sz, **kwargs),
+    #         torch.zeros(batch_sz, self._stoch_sz, **kwargs),
+    #         torch.zeros(batch_sz, self._stoch_sz, **kwargs),
+    #         torch.zeros(batch_sz, self._deter_sz, **kwargs)
+    #                         )
+    #    return state
 
 
 
