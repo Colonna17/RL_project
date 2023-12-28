@@ -34,7 +34,7 @@ class AgentModel(nn.Module):
     """
     def __init__(
         self,
-        action_shape,
+        action_shape = (-0.4, 0.4, (17,)),
         image_shape=(3, 64, 64),
         stochastic_sz=30,
         deterministic_sz=200,
@@ -141,4 +141,61 @@ class AgentModel(nn.Module):
         return state
 
 
+class AtariDreamerModel(AgentModel):
 
+    def __init__(self, action_shape = (-0.4, 0.4, (17,))):
+        super().__init__()
+
+    def forward(
+        self,
+        observation: torch.Tensor,
+        prev_action: torch.Tensor = None,
+        prev_state: RSSMState = None,
+    ):
+        lead_dim, T, B, img_shape = infer_leading_dims(observation, 3)
+        observation = (
+            observation.reshape(T * B, *img_shape).type(self.dtype) / 255.0 - 0.5
+        )
+        prev_action = prev_action.reshape(T * B, -1).to(self.dtype)
+        if prev_state is None:
+            prev_state = self.representation.initial_state(
+                prev_action.size(0), device=prev_action.device, dtype=self.dtype
+            )
+        state = self.get_state_representation(observation, prev_action, prev_state)
+
+        action, action_dist = self.policy(state)
+        return_spec = ModelReturnSpec(action, state)
+        return_spec = buffer_func(return_spec, restore_leading_dims, lead_dim, T, B)
+        return return_spec
+
+
+
+
+
+
+
+class DMCDreamerAgent(AgentModel):
+    def __init__(self, ModelCls=AtariDreamerModel, **kwargs):
+        super().__init__(ModelCls=ModelCls, **kwargs)
+
+    def make_env_to_model_kwargs(self, env_spaces):
+        return dict(
+            image_shape=env_spaces.observation.shape,
+            output_size=env_spaces.action.shape[0],
+            action_shape=env_spaces.action.shape[0],
+            action_dist="tanh_normal",
+        )
+    
+
+class AtariDreamerAgent(AgentModel):
+    def __init__(self, ModelCls=AtariDreamerModel, **kwargs):
+        super().__init__(ModelCls=ModelCls, **kwargs)
+
+    def make_env_to_model_kwargs(self, env_spaces):
+        return dict(
+            image_shape=env_spaces.observation.shape,
+            action_shape=env_spaces.action.shape,
+            action_dist="one_hot",
+        )
+    
+ModelReturnSpec = namedarraytuple("ModelReturnSpec", ["action", "state"])

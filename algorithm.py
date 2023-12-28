@@ -9,7 +9,7 @@ from rlpyt.utils.quick_args import save__init__args
 from rlpyt.utils.tensor import infer_leading_dims
 from tqdm import tqdm
 
-f#rom dreamer.models.rnns import get_feat, get_dist
+#from dreamer.models.rnns import get_feat, get_dist
 from utils.functions import video_summary, get_parameters, FreezeParameters, get_dist, get_feat
 
 
@@ -38,6 +38,10 @@ def initialize_replay_buffer(self, examples, batch_spec, async_=False):
         discount=self.discount,
         n_step_return=self.n_step_return,
     )
+    """
+    UniformSequenceReplayBuf comes from rlypt library and is a module that 
+    replays buffers of sequences with starting state chosen uniformly randomly.
+    """
     replay_buffer = UniformSequenceReplayBuffer(**replay_kwargs)
     return replay_buffer
 

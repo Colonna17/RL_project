@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.distributions as td
 
-from utils.utils import SampleDist
+from utils.functions import SampleDist
 from torch.distributions import TanhTransform ,TransformedDistribution, Independent
 
 
