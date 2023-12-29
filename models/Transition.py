@@ -26,23 +26,27 @@ class TransitionModel(nn.Module):
         #self._rnn_input_model = self._build_rnn_input_model()
         self.stochastic_model = nn.Sequential(nn.Linear(self.hidden_sz,self.hidden_sz),
                                               self.activation,
-                                              nn.Linear(self.hidden_sz, self.hidden_sz *2),
+                                              nn.Linear(self.hidden_sz, self.stochastic_sz *2),
                                                     )
         self.distribution = distribution
 
 
 
     def forward(self, prev_action ,prev_state):
+        # print('QUA SIAMO IN TRANSITION')
         prev_input = self.activation(self.linear1(torch.cat([prev_action, prev_state.stoch], dim=-1)))
         # In GRUcell we pass previous  stochastic state and action as input features and
         # previous deterministic state as previous hidden state of the rnn
-        print('COSA SUCCEDE QUA ?')
-        print('prev_input size:',prev_input.size(), '  prev_state.deter size:', prev_state.deter.size())
+        #print('COSA SUCCEDE QUA ?')
+        #print('prev_input size:',prev_input.size(), '  prev_state.deter size:', prev_state.deter.size())
         deterministic_state = self.gru(prev_input, prev_state.deter)
+        #print('deterministic_state.size = ', deterministic_state.size())
         mean, std = torch.chunk(self.stochastic_model(deterministic_state), 2, dim=-1)
+        #print('mean size = ', mean.size(),'std size =', std.size())
         std = tf.softplus(std) + 0.1
         dist = self.distribution(mean, std) #Normal distribution
         stochastic_state = dist.rsample()
+        #print( 'stochastic_state size = ', stochastic_state.size())
         #stochastic_state = dist.sample()
         return RSSMState(mean, std, stochastic_state, deterministic_state)
 

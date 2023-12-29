@@ -145,14 +145,14 @@ class AtariDreamerModel(AgentModel):
         lead_dim, T, B, img_shape = infer_leading_dims(observation, 3)
         observation = ( observation.reshape(T * B, *img_shape).type(self.dtype) / 255.0 - 0.5)
         prev_action = prev_action.reshape(T * B, -1).to(self.dtype)
-        print('FORSE È QUA IL PROBLEMA? (1)')
-        print(prev_state)
+        # print('FORSE È QUA IL PROBLEMA? (1)')
+        # print(prev_state)
         if prev_state is None:
             prev_state = self.representation.initial_state(
                 prev_action.size(0), device=prev_action.device, dtype=self.dtype
             )
-            print('FORSE È QUA IL PROBLEMA? (2)')
-            print(prev_state.deter.size())
+            # print('FORSE È QUA IL PROBLEMA? (2)')
+            # print(prev_state.deter.size())
         state = self.get_state_representation(observation, prev_action, prev_state)
 
         action, action_dist = self.policy(state)

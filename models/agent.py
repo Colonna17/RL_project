@@ -75,6 +75,7 @@ class AgentModel(nn.Module):
                                             action_dist)
         self.reward_model = RewardModel()
         self.value_model = ValueModel()
+        self.rollout = RSSMRollout(self.representation, self.transition)
         self.dtype = dtype
         # if use_pcont:
         #     self.pcont = DenseModel(
@@ -90,6 +91,8 @@ class AgentModel(nn.Module):
 
     def policy(self, state):
         input = torch.cat((state.stoch, state.deter), dim=-1)
+        # print('LE DIM INIZIALI SONO: state.stoch = ', state.stoch.size(), 'state.deter =', state.deter.size())
+        # print(' E QUA COSA ESCE?', input, input.size())
         action_dist = self.action_decoder(input)
         if self.action_dist == "tanh_normal":
             if self.training:  # use agent.train(bool) or agent.eval()
@@ -127,7 +130,10 @@ class AgentModel(nn.Module):
             # print('prev_state size:', prev_state.size())
         
         _, state = self.representation(obs_embed, prev_action, prev_state)
+        # print('CHE DIMENSIONI HA LO STATE CHE ESCE DA REPRESENTATION?')
+        # print( 'RISPOSTA', 'stoch:',state.stoch.size(), 'deter:', state.deter.size())
         return state
+    
     def state_representation(
         self, observation, prev_action= None, prev_state= None,):
         """

@@ -34,7 +34,7 @@ class RepresentationModel(nn.Module):
         self.linear1 = nn.Linear(self.action_sz + self.stochastic_sz, self.hidden_sz)
         self.stochastic_model = nn.Sequential(nn.Linear(self.deterministic_sz + self.observation_sz, self.hidden_sz),
                                               self.activation(),
-                                              nn.Linear(self.hidden_sz, self.hidden_sz *2)
+                                              nn.Linear(self.hidden_sz, self.stochastic_sz *2)
                                             )
         self.dist = distribution
         self.transition = transition_model
@@ -45,7 +45,7 @@ class RepresentationModel(nn.Module):
         state =RSSMState(torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
             torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
             torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
-            torch.zeros(batch_sz, self.stochastic_sz, **kwargs)
+            torch.zeros(batch_sz, self.deterministic_sz, **kwargs)
                             )
         return state
     
@@ -56,6 +56,12 @@ class RepresentationModel(nn.Module):
         prior_state = self.transition(prev_action, prev_state)
         stochastic_input = torch.cat([prior_state.deter, observation], -1)
         mean, std = torch.chunk(self.stochastic_model(stochastic_input), 2, dim=-1)
+        # print('CHE DIMENSIONI HA PRIOR STATE?')# PRIOR STATE È GIUSTO
+        # print('stoch:',prior_state.stoch.size(), 'deter', prior_state.deter.size())
+        # print('CHE DIMENSIONI HA STOCHASTIC INPUT?')
+        # print(stochastic_input.size())
+        # print('CHE DIMENSIONI HA L OUTPUT DI STOCHASTIC MODEL?')
+        # print(self.stochastic_model(stochastic_input).size())
         std = tf.softplus(std) + 0.1
         dist = self.dist(mean, std)
         stoch_state = dist.rsample()

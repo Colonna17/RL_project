@@ -18,12 +18,12 @@ class ActionModel(nn.Module):
                          min_std=1e-4, init_std=5, mean_scale=5, n_layers =3):
         super().__init__()
         self.action_sz = action_sz
-        self.input_sz = (input_sz)
+        self.input_sz = input_sz
         #self.stochastic_sz = stochastic_sz
         #self.deterministic_sz = deterministic_sz
         self.hidden_sz = hidden_sz 
         self.distribution = td.Normal
-        self.activation = nn.ELU
+        self.activation = nn.ELU()
         self.mean_scale = mean_scale
         self.min_std = min_std
         self.init_std = init_std
