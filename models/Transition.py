@@ -14,29 +14,21 @@ RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
 """
 
 class TransitionModel(nn.Module):
-    def __init__(self, action_sz, stochastic_sz, deterministic_sz, hidden_sz, distribution = td.Normal):
+    def __init__(self, action_sz, stochastic_sz = 30, deterministic_sz=200, hidden_sz=200, distribution = td.Normal):
         super().__init__()
         self.action_sz = action_sz
         self.stochastic_sz= stochastic_sz
         self.deterministic_sz = deterministic_sz
         self.hidden_sz = hidden_sz
-        self.activation = nn.ELU
+        self.activation = nn.ELU()
         self.gru = nn.GRUCell(hidden_sz, deterministic_sz)
         self.linear1 = nn.Linear(self.action_sz + self.stochastic_sz, self.hidden_sz)
         #self._rnn_input_model = self._build_rnn_input_model()
         self.stochastic_model = nn.Sequential(nn.Linear(self.hidden_sz,self.hidden_sz),
-                                              self.activation(),
+                                              self.activation,
                                               nn.Linear(self.hidden_sz, self.hidden_sz *2),
                                                     )
-        self._dist = distribution
-
-    # def initial_state(self, batch_sz, ):
-    #     state =RSSMState(torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-    #         torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-    #         torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-    #         torch.zeros(batch_sz, self._deter_sz, **kwargs)
-    #                         )
-    #    return state
+        self.distribution = distribution
 
 
 
@@ -44,6 +36,8 @@ class TransitionModel(nn.Module):
         prev_input = self.activation(self.linear1(torch.cat([prev_action, prev_state.stoch], dim=-1)))
         # In GRUcell we pass previous  stochastic state and action as input features and
         # previous deterministic state as previous hidden state of the rnn
+        print('COSA SUCCEDE QUA ?')
+        print('prev_input size:',prev_input.size(), '  prev_state.deter size:', prev_state.deter.size())
         deterministic_state = self.gru(prev_input, prev_state.deter)
         mean, std = torch.chunk(self.stochastic_model(deterministic_state), 2, dim=-1)
         std = tf.softplus(std) + 0.1

@@ -63,9 +63,9 @@ class AgentModel(nn.Module):
         self.observation_decoder = ObservationDec()
         self.action_shape = action_shape
         self.action_sz = np.prod(action_shape)
-        self.transition = TransitionModel(self.action_size, stochastic_sz, deterministic_sz, hidden_size)
-        self.representation = RepresentationModel(self.transition, encoder_embed_size,
-                                                   self.action_size, stochastic_sz,
+        self.transition = TransitionModel(self.action_sz, stochastic_sz, deterministic_sz, hidden_size)
+        self.representation = RepresentationModel(self.transition, self.action_sz,
+                                                  encoder_embed_size, stochastic_sz,
                                                      deterministic_sz,hidden_size)
         self.rollout = Representation_iterator(self.representation, self.transition)
         feature_size = stochastic_sz + deterministic_sz
@@ -107,7 +107,27 @@ class AgentModel(nn.Module):
         else:
             action = action_dist.sample()
         return action, action_dist
-
+    
+    def get_state_representation(self,observation, prev_action, prev_state):
+        # print('E INVECE QUA COSA SUCCEDE ? (1)')
+        # print('prev_state size:', prev_state, prev_state.deter.size())
+        obs_embed = self.observation_encoder(observation)
+        if prev_action is None:
+            prev_action = torch.zeros(
+                observation.size(0),
+                self.action_shape,
+                device=observation.device,
+                dtype=observation.dtype,
+            )
+        if prev_state is None:
+            prev_state = self.representation.initial_state(
+                prev_action.size(0), device=prev_action.device, dtype=prev_action.dtype
+            )
+            # print('E INVECE QUA COSA SUCCEDE ? (2)')
+            # print('prev_state size:', prev_state.size())
+        
+        _, state = self.representation(obs_embed, prev_action, prev_state)
+        return state
     def state_representation(
         self, observation, prev_action= None, prev_state= None,):
         """
@@ -143,9 +163,6 @@ class AgentModel(nn.Module):
 
 class AtariDreamerModel(AgentModel):
 
-    def __init__(self, action_shape = (-0.4, 0.4, (17,))):
-        super().__init__()
-
     def forward(
         self,
         observation: torch.Tensor,
@@ -169,33 +186,4 @@ class AtariDreamerModel(AgentModel):
         return return_spec
 
 
-
-
-
-
-
-class DMCDreamerAgent(AgentModel):
-    def __init__(self, ModelCls=AtariDreamerModel, **kwargs):
-        super().__init__(ModelCls=ModelCls, **kwargs)
-
-    def make_env_to_model_kwargs(self, env_spaces):
-        return dict(
-            image_shape=env_spaces.observation.shape,
-            output_size=env_spaces.action.shape[0],
-            action_shape=env_spaces.action.shape[0],
-            action_dist="tanh_normal",
-        )
-    
-
-class AtariDreamerAgent(AgentModel):
-    def __init__(self, ModelCls=AtariDreamerModel, **kwargs):
-        super().__init__(ModelCls=ModelCls, **kwargs)
-
-    def make_env_to_model_kwargs(self, env_spaces):
-        return dict(
-            image_shape=env_spaces.observation.shape,
-            action_shape=env_spaces.action.shape,
-            action_dist="one_hot",
-        )
-    
 ModelReturnSpec = namedarraytuple("ModelReturnSpec", ["action", "state"])

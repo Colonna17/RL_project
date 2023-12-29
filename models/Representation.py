@@ -32,7 +32,7 @@ class RepresentationModel(nn.Module):
         self.activation = nn.ELU
         self.gru = nn.GRUCell(hidden_sz, deterministic_sz)
         self.linear1 = nn.Linear(self.action_sz + self.stochastic_sz, self.hidden_sz)
-        self.stochastic_model = nn.Sequential(nn.Linear(self.deterministic_sz + self.observation_sz, self._hidden_size),
+        self.stochastic_model = nn.Sequential(nn.Linear(self.deterministic_sz + self.observation_sz, self.hidden_sz),
                                               self.activation(),
                                               nn.Linear(self.hidden_sz, self.hidden_sz *2)
                                             )
@@ -42,10 +42,10 @@ class RepresentationModel(nn.Module):
 
 
     def initial_state(self, batch_sz, **kwargs):
-        state =RSSMState(torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-            torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-            torch.zeros(batch_sz, self._stoch_sz, **kwargs),
-            torch.zeros(batch_sz, self._deter_sz, **kwargs)
+        state =RSSMState(torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
+            torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
+            torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
+            torch.zeros(batch_sz, self.stochastic_sz, **kwargs)
                             )
         return state
     
@@ -81,7 +81,7 @@ class Representation_iterator(nn.Module):
         prior states: size(time_steps, batch_size, state_size)
     """
 
-    def __init__(self, transition_model, representation_model, observations):
+    def __init__(self, transition_model, representation_model):
         super().__init__()
         self.transition_model = transition_model
         self.representation_model = representation_model

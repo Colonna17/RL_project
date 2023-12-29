@@ -66,6 +66,7 @@ class DreamerAgent(RecurrentAgentMixin, BaseAgent):
             (observation, prev_action, init_rnn_state), device=self.device
         )
         return self.model(*model_inputs)
+        
 
     @torch.no_grad()
     def step(self, observation, prev_action, prev_reward):
@@ -77,6 +78,8 @@ class DreamerAgent(RecurrentAgentMixin, BaseAgent):
         (no grad)
         """
         model_inputs = buffer_to((observation, prev_action), device=self.device)
+        # print( ' SO LILLOOOOOOOOOOOOOOOOOOOOOO')
+        # print(*model_inputs)
         action, state = self.model(*model_inputs, self.prev_rnn_state)
         action = self.exploration(action)
         # Model handles None, but Buffer does not, make zeros if needed:
@@ -142,10 +145,14 @@ class AtariDreamerModel(AgentModel):
         lead_dim, T, B, img_shape = infer_leading_dims(observation, 3)
         observation = ( observation.reshape(T * B, *img_shape).type(self.dtype) / 255.0 - 0.5)
         prev_action = prev_action.reshape(T * B, -1).to(self.dtype)
+        print('FORSE È QUA IL PROBLEMA? (1)')
+        print(prev_state)
         if prev_state is None:
             prev_state = self.representation.initial_state(
                 prev_action.size(0), device=prev_action.device, dtype=self.dtype
             )
+            print('FORSE È QUA IL PROBLEMA? (2)')
+            print(prev_state.deter.size())
         state = self.get_state_representation(observation, prev_action, prev_state)
 
         action, action_dist = self.policy(state)
@@ -180,3 +187,4 @@ class AtariDreamerAgent(DreamerAgent):
         )
 
 ModelReturnSpec = namedarraytuple("ModelReturnSpec", ["action", "state"])
+

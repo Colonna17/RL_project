@@ -14,15 +14,15 @@ from torch.distributions import TanhTransform ,TransformedDistribution, Independ
 #REMEMBER: Action model outputs a tanh-transformed Gaussian.This allowes to reparametrized sampling36-93-23
 
 class ActionModel(nn.Module):
-    def __init__(self, action_sz, input_sz, stochastic_sz, deterministic_sz, hidden_sz, distribution = td.Normal,
+    def __init__(self, action_sz, input_sz, hidden_sz , layers, distribution = td.Normal,
                          min_std=1e-4, init_std=5, mean_scale=5, n_layers =3):
         super().__init__()
         self.action_sz = action_sz
-        self.input_sz = input_sz
-        self.stochastic_sz = stochastic_sz
-        self.deterministic_sz = deterministic_sz
+        self.input_sz = (input_sz)
+        #self.stochastic_sz = stochastic_sz
+        #self.deterministic_sz = deterministic_sz
         self.hidden_sz = hidden_sz 
-        self.distribution = distribution
+        self.distribution = td.Normal
         self.activation = nn.ELU
         self.mean_scale = mean_scale
         self.min_std = min_std
