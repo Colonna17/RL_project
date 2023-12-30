@@ -75,7 +75,7 @@ class AgentModel(nn.Module):
                                             action_dist)
         self.reward_model = RewardModel()
         self.value_model = ValueModel()
-        self.rollout = RSSMRollout(self.representation, self.transition)
+        #self.rollout = RSSMRollout(self.representation, self.transition)
         self.dtype = dtype
         # if use_pcont:
         #     self.pcont = DenseModel(

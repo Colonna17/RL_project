@@ -297,9 +297,7 @@ class Dreamer(RlAlgorithm):
             batch_b, device=action.device, dtype=action.dtype
         )
         # Rollout model by taking the same series of actions as the real model
-        prior, post = model.rollout.rollout_representation(
-            batch_t, embed, action, prev_state
-        )
+        prior, post = model.rollout(batch_t, embed, action, prev_state)
         # Flatten our data (so first dimension is batch_t * batch_b = batch_size)
         # since we're going to do a new rollout starting from each state visited in each batch.
 
