@@ -305,6 +305,7 @@ class Dreamer(RlAlgorithm):
 
         # Model Loss
         feat = get_feat(post)
+        #print('BELLA FRATÈ, QUESTA È LA DIMENSIONE  DI feat:', feat.size())
         image_pred = model.observation_decoder(feat)
         reward_pred = model.reward_model(feat)
         reward_loss = -torch.mean(reward_pred.log_prob(reward))

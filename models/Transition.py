@@ -34,6 +34,7 @@ class TransitionModel(nn.Module):
 
     def forward(self, prev_action ,prev_state):
         # print('QUA SIAMO IN TRANSITION')
+        # print('prev_state:', prev_state)
         prev_input = self.activation(self.linear1(torch.cat([prev_action, prev_state.stoch], dim=-1)))
         # In GRUcell we pass previous  stochastic state and action as input features and
         # previous deterministic state as previous hidden state of the rnn

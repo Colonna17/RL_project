@@ -67,7 +67,7 @@ class AgentModel(nn.Module):
         self.representation = RepresentationModel(self.transition, self.action_sz,
                                                   encoder_embed_size, stochastic_sz,
                                                      deterministic_sz,hidden_size)
-        self.rollout = Representation_iterator(self.representation, self.transition)
+        self.rollout = Representation_iterator(self.transition ,self.representation)
         feature_size = stochastic_sz + deterministic_sz
         self.action_dist = action_dist
         self.action_decoder = ActionModel(self.action_sz, feature_size, 
@@ -154,7 +154,7 @@ class AgentModel(nn.Module):
             torch.zeros(sz, self.stochastic_sz, device=prev_action.device, dtype=prev_action.dtype),
             torch.zeros(sz, self.stochastic_sz, device=prev_action.device, dtype=prev_action.dtype),
             torch.zeros(sz, self.stochastic_sz, device=prev_action.device, dtype=prev_action.dtype),
-            torch.zeros(sz, self.stochastic_sz, device=prev_action.device, dtype=prev_action.dtype),
+            torch.zeros(sz, self.deterministic_sz, device=prev_action.device, dtype=prev_action.dtype),
                                   ) 
             # prev_state = self.representation.initial_state(
             #     sz, device=prev_action.device, dtype=prev_action.dtype

@@ -92,7 +92,7 @@ class Representation_iterator(nn.Module):
         self.transition_model = transition_model
         self.representation_model = representation_model
 
-    def forward(self,time_steps, actions, starting_state, observations):
+    def forward(self,time_steps, observations, actions, starting_state):
         priors =[]
         posteriors = []
         previous_state = starting_state
