@@ -429,12 +429,10 @@ class Dreamer(RlAlgorithm):
         Then for time steps t+1:T, uses the state transition model.
         Outputs 3 different frames to video: ground truth, reconstruction, error
         """
-        print('INIZIAMO A FARE IL VIDEO')
         lead_dim, batch_t, batch_b, img_shape = infer_leading_dims(observation, 3)
         model = self.agent.model
         ground_truth = observation[:, :n] + 0.5
         reconstruction = image_pred.mean[:t, :n]
-
         prev_state = post[t - 1, :n]
         prior = model.rollout_transition(
             batch_t - t, action[t:, :n], prev_state
@@ -444,9 +442,11 @@ class Dreamer(RlAlgorithm):
         error = (model - ground_truth + 1) / 2
         # concatenate vertically on height dimension
         openl = torch.cat((ground_truth, model, error), dim=3)
+        
         openl = openl.transpose(1, 0)  # N,T,C,H,W
-        torch.save(openl, 'videos\test{}'.format(randint(0,100000)))
+        torch.save(openl, 'videos\try{}.pt'.format(randint(0,100000)))
         video_summary("videos/model_error", torch.clamp(openl, 0.0, 1.0), step)
+
 
     def compute_return(
         self,
