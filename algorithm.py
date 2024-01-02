@@ -8,6 +8,7 @@ from rlpyt.utils.collections import namedarraytuple
 from rlpyt.utils.quick_args import save__init__args
 from rlpyt.utils.tensor import infer_leading_dims
 from tqdm import tqdm
+from random import randint
 
 #from dreamer.models.rnns import get_feat, get_dist
 from utils.functions import video_summary, get_parameters, FreezeParameters, get_dist, get_feat
@@ -108,7 +109,7 @@ class Dreamer(RlAlgorithm):
         OptimCls=torch.optim.Adam,
         optim_kwargs=None,
         initial_optim_state_dict=None,
-        replay_size=int(5e4),############ECCOLO
+        replay_size=int(1e5),############ECCOLO
         replay_ratio=8,
         n_step_return=1,
         updates_per_sync=1,  # For async mode only. (not implemented)
@@ -428,6 +429,7 @@ class Dreamer(RlAlgorithm):
         Then for time steps t+1:T, uses the state transition model.
         Outputs 3 different frames to video: ground truth, reconstruction, error
         """
+        print('INIZIAMO A FARE IL VIDEO')
         lead_dim, batch_t, batch_b, img_shape = infer_leading_dims(observation, 3)
         model = self.agent.model
         ground_truth = observation[:, :n] + 0.5
@@ -443,6 +445,7 @@ class Dreamer(RlAlgorithm):
         # concatenate vertically on height dimension
         openl = torch.cat((ground_truth, model, error), dim=3)
         openl = openl.transpose(1, 0)  # N,T,C,H,W
+        torch.save(openl, 'videos\test{}'.format(randint(0,100000)))
         video_summary("videos/model_error", torch.clamp(openl, 0.0, 1.0), step)
 
     def compute_return(
