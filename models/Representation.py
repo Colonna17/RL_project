@@ -47,7 +47,7 @@ class RepresentationModel(nn.Module):
             torch.zeros(batch_sz, self.stochastic_sz, **kwargs),
             torch.zeros(batch_sz, self.deterministic_sz, **kwargs)
                             )
-        print(' DIMENSIONI DELL INITIAL STATE.STOCH = ', state.stoch.size())
+        #print(' DIMENSIONI DELL INITIAL STATE.STOCH = ', state.stoch.size())
         return state
     
 

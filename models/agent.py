@@ -69,6 +69,7 @@ class AgentModel(nn.Module):
                                                      deterministic_sz,hidden_size)
         self.rollout = Representation_iterator(self.transition ,self.representation)
         self.rollout_policy = Policy_iterator(self.transition)
+        self.rollout_transition = Transition_iterator(self.transition)
         feature_size = stochastic_sz + deterministic_sz
         self.action_dist = action_dist
         self.action_decoder = ActionModel(self.action_sz, feature_size, 

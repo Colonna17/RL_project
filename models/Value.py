@@ -17,7 +17,7 @@ class ValueModel(nn.Module):
         self.linear1 = nn.Linear(self.input_size, self.hidden_sz)
         self.linear2 = nn.Linear(self.hidden_sz, self.hidden_sz)
         self.linear3 = nn.Linear(self.hidden_sz, int(np.prod(self.output_sz)))
-        self.activation = nn.ELU
+        self.activation = nn.ELU()
 
     
     def forward(self, input): # Input is the concatenation of stoch and deterministic states
@@ -29,6 +29,6 @@ class ValueModel(nn.Module):
         output = self.linear3(dense)
         output = torch.reshape(output, input.shape[:-1] + self.output_sz)
         # REMEMBER: For Normal -> arg_constraints = {'loc': Real(), 'scale': GreaterThan(lower_bound=0.0)}
-        output = td.independent.Independent( self.distribution(output, 1), len(self.output_sz))
+        output = td.independent.Independent( self.dist(output, 1), len(self.output_sz))
 
         return output

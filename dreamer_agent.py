@@ -48,12 +48,12 @@ class DreamerAgent(RecurrentAgentMixin, BaseAgent):
         model_kwargs=None,
         initial_model_state_dict=None,
     ):
+        super().__init__(ModelCls, model_kwargs, initial_model_state_dict)
         self.train_noise = train_noise
         self.eval_noise = eval_noise
         self.expl_type = expl_type
         self.expl_min = expl_min
         self.expl_decay = expl_decay
-        super().__init__(ModelCls, model_kwargs, initial_model_state_dict)
         self._mode = "train"
         self._itr = 0
 

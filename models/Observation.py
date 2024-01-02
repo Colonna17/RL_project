@@ -106,14 +106,14 @@ class ObservationDec(nn.Module):
         observation: returns an image size tensor, size(*batch_shape, *self.shape)
         """
         x = encoding
-        print('ENCODING_SIZE:', encoding.size())
+        #print('ENCODING_SIZE:', encoding.size())
         batch_shape = x.shape[:-1] # 50 x 50
         embed_size = x.shape[-1] # 230
         squeezed_size = np.prod(batch_shape).item() #2500
         #print('EMBED_SIZE', embed_size)
         #print('SQUEEZED_SIZE:', squeezed_size)
         x = x.reshape(squeezed_size, embed_size) #2500x230
-        print('COSA ESCE DOPO IL RESHAPE? =', x.size())
+        #print('COSA ESCE DOPO IL RESHAPE? =', x.size())
         x = self.linear(x)
         x = torch.reshape(x, (squeezed_size, *self.conv_shape))
         x = self.decoder(x)
