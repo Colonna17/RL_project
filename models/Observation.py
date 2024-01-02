@@ -52,7 +52,7 @@ class ObservationEnc(nn.Module):
 
 
 class ObservationDec(nn.Module):
-    def __init__(self, stride_sz=2, hidden_sz=32, kernel_sz = 5, img_size = (3,64,64), embedding_size = 1024):
+    def __init__(self, hidden_sz=32, stride_sz=2, activation = nn.ReLU, embedding_size = 1024, img_size = (3,64,64),):
         super().__init__()
         self.hidden_sz = hidden_sz
         self.stride = stride_sz
@@ -62,6 +62,7 @@ class ObservationDec(nn.Module):
         dim2 = img_size [1]
         self.activation = nn.ReLU   
         self.size = img_size
+        self.embedding_size = embedding_size
         conv1_shape = conv_out_shape((dim2 , dim2 ), padding, 6, stride)
         conv1_pad = output_padding_shape(
             (dim2 , dim2 ), conv1_shape, padding, 6, stride
@@ -79,7 +80,10 @@ class ObservationDec(nn.Module):
             conv3_shape, conv4_shape, padding, 5, stride
         )
         self.conv_shape = (hidden_sz*32, *conv4_shape)
-        self.linear = nn.Linear(embedding_size , hidden_sz*32* np.prod(conv4_shape).item())
+        #self.linear = nn.Linear(embedding_size , hidden_sz*32* np.prod(conv4_shape).item())
+        # ATTENTION !!!!! Qua faccio hard coding e metto il valore di embedding_size uguale 
+        # a 230. Potrei doverlo cambiare usando un agente diverso
+        self.linear = nn.Linear(230 , hidden_sz*32* np.prod(conv4_shape).item())
 
         self.decoder = nn.Sequential(nn.ConvTranspose2d(hidden_sz*32, hidden_sz*4, 5, stride,
                                                         output_padding=conv4_pad),
@@ -103,11 +107,12 @@ class ObservationDec(nn.Module):
         """
         x = encoding
         print('ENCODING_SIZE:', encoding.size())
-        batch_shape = x.shape[:-1]
-        embed_size = x.shape[-1]
-        squeezed_size = np.prod(batch_shape).item()
-        print('SQUEEZED_SIZE:', squeezed_size)
-        x = x.reshape(squeezed_size, embed_size)
+        batch_shape = x.shape[:-1] # 50 x 50
+        embed_size = x.shape[-1] # 230
+        squeezed_size = np.prod(batch_shape).item() #2500
+        #print('EMBED_SIZE', embed_size)
+        #print('SQUEEZED_SIZE:', squeezed_size)
+        x = x.reshape(squeezed_size, embed_size) #2500x230
         print('COSA ESCE DOPO IL RESHAPE? =', x.size())
         x = self.linear(x)
         x = torch.reshape(x, (squeezed_size, *self.conv_shape))

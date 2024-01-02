@@ -3,7 +3,7 @@ import torch.distributions as td
 import torch.nn as nn
 import torch.nn.functional as tf
 from rlpyt.utils.collections import namedarraytuple
-#from rlpyt.utils.buffer import buffer_method
+from rlpyt.utils.buffer import buffer_method
 
 RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
 """
@@ -12,6 +12,15 @@ RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
     indexing (__getitem__) behavior (e.g. numpy arrays or torch tensors).
     Can be used as a wrapper to the state of the RSSM models
 """
+
+
+def stack_states(rssm_states: list, dim):
+    return RSSMState(
+        torch.stack([state.mean for state in rssm_states], dim=dim),
+        torch.stack([state.std for state in rssm_states], dim=dim),
+        torch.stack([state.stoch for state in rssm_states], dim=dim),
+        torch.stack([state.deter for state in rssm_states], dim=dim),
+    )
 
 class TransitionModel(nn.Module):
     def __init__(self, action_sz, stochastic_sz = 30, deterministic_sz=200, hidden_sz=200, distribution = td.Normal):
@@ -82,3 +91,29 @@ class Transition_iterator(nn.Module):
         torch.stack([state.deter for state in priors], dim=0)
         )
 
+class Policy_iterator(nn.Module):
+    def __init__(self, tranistion_model):
+        super().__init__()
+        self.transition_model = tranistion_model
+        
+        """
+        Roll out the model with a policy function.
+        :param steps: number of steps to roll out
+        :param policy: RSSMState -> action
+        :param prev_state: RSSM state, size(batch_size, state_size)
+        :return: next states size(time_steps, batch_size, state_size),
+                 actions size(time_steps, batch_size, action_size)
+        """
+    def forward(self, time_steps,policy, starting_state):
+        state = starting_state
+        next_states = []
+        actions = []
+        state = buffer_method(state, "detach")
+        for t in range(time_steps):
+            action, _ = policy(buffer_method(state, "detach"))
+            state = self.transition_model(action, state)
+            next_states.append(state)
+            actions.append(action)
+        next_states = stack_states(next_states, dim=0)
+        actions = torch.stack(actions, dim=0)
+        return next_states, actions

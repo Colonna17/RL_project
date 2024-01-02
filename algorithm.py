@@ -283,7 +283,7 @@ class Dreamer(RlAlgorithm):
         # Extract tensors from the Samples object
         # They all have the batch_t dimension first, but we'll put the batch_b dimension first.
         # Also, we convert all tensors to floats so they can be fed into our models.
-
+        print('OBSERVATION SIZE:', observation.size())
         lead_dim, batch_t, batch_b, img_shape = infer_leading_dims(observation, 3)
         # squeeze batch sizes to single batch dimension for imagination roll-out
         batch_size = batch_t * batch_b
@@ -292,20 +292,22 @@ class Dreamer(RlAlgorithm):
         observation = observation.type(self.type) / 255.0 - 0.5
         # embed the image
         embed = model.observation_encoder(observation)
-
+        print('EMBED SIZE:', embed.size())
         prev_state = model.representation.initial_state(
             batch_b, device=action.device, dtype=action.dtype
         )
         # Rollout model by taking the same series of actions as the real model
         prior, post = model.rollout(batch_t, embed, action, prev_state)
+        print('PRIOR SIZE',prior.stoch.size(), 'POST SIZE', post.stoch.size())
         # Flatten our data (so first dimension is batch_t * batch_b = batch_size)
         # since we're going to do a new rollout starting from each state visited in each batch.
 
         # Compute losses for each component of the model
 
         # Model Loss
+        print('POST SIZE:',post.stoch.size())
         feat = get_feat(post)
-        #print('BELLA FRATÈ, QUESTA È LA DIMENSIONE  DI feat:', feat.size())
+        print('BELLA FRATÈ, QUESTA È LA DIMENSIONE  DI feat:', feat.size())
         image_pred = model.observation_decoder(feat)
         reward_pred = model.reward_model(feat)
         reward_loss = -torch.mean(reward_pred.log_prob(reward))
@@ -339,7 +341,7 @@ class Dreamer(RlAlgorithm):
         # Rollout the policy for self.horizon steps. Variable names with imag_ indicate this data is imagined not real.
         # imag_feat shape is [horizon, batch_t * batch_b, feature_size]
         with FreezeParameters(self.model_modules):
-            imag_dist, _ = model.rollout.rollout_policy(
+            imag_dist, _ = model.rollout_policy(
                 self.horizon, model.policy, flat_post
             )
 

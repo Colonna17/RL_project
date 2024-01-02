@@ -14,7 +14,7 @@ from models.Action import ActionModel
 from models.Reward import RewardModel
 from models.Observation import ObservationDec, ObservationEnc
 from models.Value import ValueModel
-from models.Transition import TransitionModel, Transition_iterator
+from models.Transition import TransitionModel, Transition_iterator, Policy_iterator
 from models.Representation import RepresentationModel, Representation_iterator
 
 
@@ -68,6 +68,7 @@ class AgentModel(nn.Module):
                                                   encoder_embed_size, stochastic_sz,
                                                      deterministic_sz,hidden_size)
         self.rollout = Representation_iterator(self.transition ,self.representation)
+        self.rollout_policy = Policy_iterator(self.transition)
         feature_size = stochastic_sz + deterministic_sz
         self.action_dist = action_dist
         self.action_decoder = ActionModel(self.action_sz, feature_size, 
