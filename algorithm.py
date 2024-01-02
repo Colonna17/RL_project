@@ -99,7 +99,7 @@ class Dreamer(RlAlgorithm):
         dataset_balance=False,
         discount=0.99,
         discount_lambda=0.95,
-        horizon=15,
+        horizon=10,
         action_dist="tanh_normal",
         action_init_std=5.0,
         expl="additive_gaussian",
@@ -109,12 +109,12 @@ class Dreamer(RlAlgorithm):
         OptimCls=torch.optim.Adam,
         optim_kwargs=None,
         initial_optim_state_dict=None,
-        replay_size=int(1e5),############ECCOLO
+        replay_size=int(3e5),############ECCOLO
         replay_ratio=8,
         n_step_return=1,
         updates_per_sync=1,  # For async mode only. (not implemented)
         free_nats=3,
-        kl_scale=1, # Beta in the paper
+        kl_scale=0.1, # Beta in the paper
         type=torch.float,
         prefill=5000,
         log_video=True,
