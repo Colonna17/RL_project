@@ -384,6 +384,7 @@ class Dreamer(RlAlgorithm):
             value_discount = discount.detach()
             value_target = returns.detach()
         value_pred = model.value_model(value_feat)
+        #Rembember: value_pred is a distribution
         log_prob = value_pred.log_prob(value_target)
         value_loss = -torch.mean(value_discount * log_prob.unsqueeze(2))
 
