@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class ObservationEnc(nn.Module):
-    def __init__(self, depth=32, stride=2, shape=(3, 64, 64), activation=nn.ReLU):
+    def __init__(self, depth=64, stride=2, shape=(3, 64, 64), activation=nn.ReLU):
         super().__init__()
         self.convolutions = nn.Sequential(
             nn.Conv2d(shape[0], 1 * depth, 4, stride),
@@ -40,7 +40,7 @@ class ObservationEnc(nn.Module):
 
 class ObservationDec(nn.Module):
     def __init__(
-        self, depth=32, stride=2, activation=nn.ReLU, embed_size=1024, shape=(3, 64, 64)
+        self, depth=64, stride=2, activation=nn.ReLU, embed_size=1024, shape=(3, 64, 64)
     ):
         super().__init__()
         self.depth = depth
