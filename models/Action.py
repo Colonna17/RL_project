@@ -28,30 +28,42 @@ class ActionModel(nn.Module):
         self.min_std = min_std
         self.init_std = init_std
         self.n_layers = n_layers
+        self.dist = distribution
         self.raw_init_std = np.log(np.exp(self.init_std) - 1)
         self.linear1 = nn.Linear(self.input_sz, self.hidden_sz)
         self.linear2 = nn.Linear(self.hidden_sz, self.hidden_sz)
         self.linear3 = nn.Linear(self.hidden_sz, self.action_sz *2)
+        self.linear4 = nn.Linear(self.hidden_sz, self.action_sz)
 
 
 
     def forward(self, input):
-        out = self.linear1(input)
-        out = self.activation(out)
-        for i in range(1, self.n_layers):
-            out = self.linear2(out)
+        if self.dist == "tanh_normal": # For continuous envs (MuJoCO)
+            out = self.linear1(input)
             out = self.activation(out)
-        out = self.linear3(out)
-        mean, std = torch.chunk(out, 2, -1)
-        mean = self.mean_scale * torch.tanh(mean / self.mean_scale)
-        std = F.softplus(std + self.raw_init_std) + self.min_std
-        dist = self.distribution(mean, std)
+            for i in range(1, self.n_layers):
+                out = self.linear2(out)
+                out = self.activation(out)
+            out = self.linear3(out)
+            mean, std = torch.chunk(out, 2, -1)
+            mean = self.mean_scale * torch.tanh(mean / self.mean_scale)
+            std = F.softplus(std + self.raw_init_std) + self.min_std
+            dist = self.distribution(mean, std)
 
-        #Apply TanhTransformed Gaussian to our base distribution as reparametrization trick
-        dist = TransformedDistribution(dist, TanhTransform ())
-        #Let's make the distributions independent along the first dim, which is the batch size
-        dist = Independent(dist, 1)
-        dist = SampleDist(dist)
+            #Apply TanhTransformed Gaussian to our base distribution as reparametrization trick
+            dist = TransformedDistribution(dist, TanhTransform ())
+            #Let's make the distributions independent along the first dim, which is the batch size
+            dist = Independent(dist, 1)
+            dist = SampleDist(dist)
+        
+        if self.dist =="one_hot":
+            out = self.linear1(input)
+            out = self.activation(out)
+            for i in range(1, self.n_layers):
+                out = self.linear2(out)
+                out = self.activation(out)
+            out = self.linear4(out)
+            dist = torch.distributions.OneHotCategorical(logits=out)
 
         return dist
 

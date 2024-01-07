@@ -16,6 +16,7 @@ from models.My_Observation import ObservationDec, ObservationEnc
 from models.Value import ValueModel
 from models.Transition import TransitionModel, Transition_iterator, Policy_iterator
 from models.Representation import RepresentationModel, Representation_iterator
+from models.pcont import PcontModel
 
 
 RSSMState = namedarraytuple("RSSMState", ["mean", "std", "stoch", "deter"])
@@ -79,10 +80,8 @@ class AgentModel(nn.Module):
         self.value_model = ValueModel()
         #self.rollout = RSSMRollout(self.representation, self.transition)
         self.dtype = dtype
-        # if use_pcont:
-        #     self.pcont = DenseModel(
-        #         feature_size, (1,), pcont_layers, pcont_hidden, dist="binary"
-        #     )
+        if use_pcont:
+            self.pcont = PcontModel()
 
     def forward( self, observation, previous_action= None, previous_state = None):
         state = self.state_representation(observation, previous_action, previous_state)
@@ -195,3 +194,4 @@ class AtariDreamerModel(AgentModel):
 
 
 ModelReturnSpec = namedarraytuple("ModelReturnSpec", ["action", "state"])
+

@@ -1,2 +1,9 @@
 gymnasium
 gymnasium[mujoco==2.3.0]
+gymnasium[atari]
+gym==0.25.2
+ale-py==0.7.2
+moviepy
+pyprind
+atari_py
+dm_control

@@ -8,21 +8,10 @@ from rlpyt.spaces.int_box import IntBox
 
 from envs.env import EnvInfo
 
-AtariTrajInfo = AtariTrajInfo
-
-
 class AtariEnv(Env):
     LOCK = threading.Lock()
 
-    def __init__(
-        self,
-        name,
-        action_repeat=4,
-        size=(84, 84),
-        grayscale=True,
-        noops=30,
-        life_done=False,
-        sticky_actions=True,
+    def __init__(self, name, action_repeat=4, size=(84, 84), grayscale=True, noops=30, life_done=False, sticky_actions=True,
     ):
         import gym
 

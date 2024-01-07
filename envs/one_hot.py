@@ -7,6 +7,9 @@ from rlpyt.spaces.float_box import FloatBox
 
 
 class OneHotAction(EnvWrapper):
+    """
+    Generate, sample or make a step with one-hot encoding vector for discreate environments.
+    """
     def __init__(self, env):
         assert isinstance(env.action_space, gym.spaces.Discrete) or isinstance(
             env.action_space, IntBox

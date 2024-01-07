@@ -170,7 +170,7 @@ class DMCDreamerAgent(DreamerAgent):
             image_shape=env_spaces.observation.shape,
             output_size=env_spaces.action.shape[0],
             action_shape=env_spaces.action.shape[0],
-            action_dist="tanh_normal",
+            action_dist="tanh_normal", #Dreamer v1 impl, for continuous action space
         )
     
 
@@ -183,7 +183,7 @@ class AtariDreamerAgent(DreamerAgent):
         return dict(
             image_shape=env_spaces.observation.shape,
             action_shape=env_spaces.action.shape,
-            action_dist="one_hot",
+            action_dist="one_hot", #Dreamer v2 impl, one-hot encoding for discrete action space
         )
 
 ModelReturnSpec = namedarraytuple("ModelReturnSpec", ["action", "state"])
