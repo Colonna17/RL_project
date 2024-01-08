@@ -317,9 +317,9 @@ class Dreamer(RlAlgorithm):
         if self.use_pcont:
             pcont_pred = model.pcont(feat)
             #print('pcont_pred = ', pcont_pred)
-            pcont_target = self.discount * (1 - done.float())
+            pcont_target =  (1 - done.float())
             #print('pcont_target = ', pcont_target)
-            pcont_loss = -torch.mean(pcont_pred.log_prob(torch.round(pcont_target)))
+            pcont_loss = -torch.mean(pcont_pred.log_prob(pcont_target))
         prior_dist = get_dist(prior)
         post_dist = get_dist(post)
         div = torch.mean(torch.distributions.kl.kl_divergence(post_dist, prior_dist))
