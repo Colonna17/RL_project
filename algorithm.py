@@ -307,7 +307,9 @@ class Dreamer(RlAlgorithm):
 
         # Model Loss
         #print('POST SIZE:',post.stoch.size())
+        #print('POST SIZE =', post.stoch.size())
         feat = get_feat(post)
+        #print('FEAT DIM = ', feat.size())
         #print('BELLA FRATÈ, QUESTA È LA DIMENSIONE  DI feat:', feat.size())
         image_pred = model.observation_decoder(feat)
         reward_pred = model.reward_model(feat)
@@ -424,7 +426,7 @@ class Dreamer(RlAlgorithm):
 
         return model_loss, actor_loss, value_loss, loss_info
 
-    def write_videos(self, observation, action, image_pred, post, step=None, n=4, t=25):
+    def write_videos(self, observation, action, image_pred, post, step=None, n=4, t=75):
         """
         observation shape T,N,C,H,W
         generates n rollouts with the model.

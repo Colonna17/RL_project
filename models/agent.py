@@ -12,7 +12,8 @@ from rlpyt.utils.tensor import (
 
 from models.Action import ActionModel
 from models.Reward import RewardModel
-from models.My_Observation import ObservationDec, ObservationEnc
+#from models.My_Observation import ObservationDec, ObservationEnc
+from models.Observation_TRY import ObservationDec, ObservationEnc
 from models.Value import ValueModel
 from models.Transition import TransitionModel, Transition_iterator, Policy_iterator
 from models.Representation import RepresentationModel, Representation_iterator
