@@ -1,0 +1,6 @@
+2024-01-13 23:25:15.137934  | dreamer_walker_walk_1 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-13 23:25:15.138613  | dreamer_walker_walk_1 Runner  master Torch threads: 6.
+2024-01-13 23:31:23.307428  | dreamer_walker_walk_1 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-13 23:31:23.308111  | dreamer_walker_walk_1 Runner  master Torch threads: 6.
+2024-01-13 23:37:33.804309  | dreamer_walker_walk_1 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-13 23:37:33.804906  | dreamer_walker_walk_1 Runner  master Torch threads: 6.

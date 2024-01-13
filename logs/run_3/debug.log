@@ -28400,3 +28400,11 @@
 2024-01-04 21:32:18.969206  | pcont_loss/Max                      0
 2024-01-04 21:32:18.969571  | -----------------------------  ----------------
 2024-01-04 21:32:18.970415  | dreamer_cartpole_balance_3 itr #279999 Optimizing over 1000 iterations.
+2024-01-13 23:57:50.492768  | dreamer_cartpole_balance_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-13 23:57:50.493526  | dreamer_cartpole_balance_3 Runner  master Torch threads: 6.
+2024-01-13 23:58:28.200640  | dreamer_cartpole_balance_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-13 23:58:28.201578  | dreamer_cartpole_balance_3 Runner  master Torch threads: 6.
+2024-01-14 00:02:42.371640  | dreamer_cartpole_balance_3 dreamer_cartpole_balance_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:02:42.372495  | dreamer_cartpole_balance_3 dreamer_cartpole_balance_3 Runner  master Torch threads: 6.
+2024-01-14 00:03:44.021334  | dreamer_cartpole_balance_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:03:44.022021  | dreamer_cartpole_balance_3 Runner  master Torch threads: 6.
