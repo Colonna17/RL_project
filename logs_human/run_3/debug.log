@@ -29516,3 +29516,15 @@
 2024-01-13 23:57:13.686586  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
 2024-01-14 00:01:16.725881  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
 2024-01-14 00:01:16.726396  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
+2024-01-14 00:08:53.535866  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:08:53.536778  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
+2024-01-14 00:25:27.869588  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:25:27.871084  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
+2024-01-14 00:26:34.070854  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:26:34.071449  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
+2024-01-14 00:26:54.543671  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:26:54.544056  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
+2024-01-14 00:27:56.256212  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:27:56.257112  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
+2024-01-14 00:31:48.981577  | dreamer_walker_walk_3 Runner  master CPU affinity: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].
+2024-01-14 00:31:48.982094  | dreamer_walker_walk_3 Runner  master Torch threads: 6.
