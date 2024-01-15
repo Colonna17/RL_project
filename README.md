@@ -7,3 +7,6 @@ and on  rlpyt library from replay buffers and rollouts (https://github.com/astoo
 Logs can be loaded on tensorboard with command:
                                          tensorboard --logdir =logs/ --host localhost --port 8088
 
+Training are performed on the jupyter notebooks running the code 
+
+
